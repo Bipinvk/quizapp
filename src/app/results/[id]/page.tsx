@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
@@ -9,13 +10,33 @@ interface Question {
   id: number;
   text: string;
   correct_option: string;
+  option_a?: string;
+  option_b?: string;
+  option_c?: string;
+  option_d?: string;
+}
+
+interface Quiz {
+  id: number;
+  topic: string;
+  num_questions: number;
+  difficulty: string;
+  questions: Question[];
+}
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
 }
 
 interface Result {
+  id: number;
   score: number;
   answers: { [key: number]: string };
-  quiz: { questions: Question[] };
-  quizId: number;
+  quiz: Quiz;
+  completed_at: string;
+  user: User;
 }
 
 export default function Results() {
@@ -34,7 +55,9 @@ export default function Results() {
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE}/api/results/`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
 
         if (!res.ok) {
@@ -43,9 +66,13 @@ export default function Results() {
         }
 
         const data: Result[] = await res.json();
-        const thisResult = data.find((r) => String(r.quizId) === quizId) || null;
+        console.log(data, "Fetched results");
+
+        // Find the result for the current quiz
+        const thisResult = data.find((r) => String(r.quiz.id) === quizId) || null;
         setResult(thisResult);
-      } catch {
+      } catch (err) {
+        console.error(err);
         toast.error('Error loading results');
       } finally {
         setLoading(false);
@@ -77,6 +104,7 @@ export default function Results() {
       <p className="text-xl mb-6">
         Score: {result.score} / {result.quiz.questions.length}
       </p>
+
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-100">
@@ -91,6 +119,7 @@ export default function Results() {
           {result.quiz.questions.map((q, i) => {
             const userAns = result.answers[q.id];
             const isCorrect = userAns === q.correct_option;
+
             return (
               <tr
                 key={q.id}
@@ -108,6 +137,7 @@ export default function Results() {
           })}
         </tbody>
       </table>
+
       <button
         onClick={() => router.back()}
         className="mt-6 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
