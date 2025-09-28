@@ -12,7 +12,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setTokenState] = useState<string | null>(Cookies.get('access_token'))
+const [token, setTokenState] = useState<string | null>(
+  Cookies.get('access_token') ?? null
+)
   const router = useRouter()
 
   const setToken = (newToken: string | null) => {

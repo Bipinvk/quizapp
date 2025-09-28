@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
-import { ThemeProvider } from 'next-themes'
 import { AuthProvider } from './context/AuthContext'
 import ToastProvider from './components/ToastProvider'
-import Navbar from './components/Navbar'
-const inter = Inter({ subsets: ['latin'] })
+import Header from './components/Header';
+import Footer from './components/Footer'
 
 export const metadata: Metadata = {
   title: 'AI Quiz App',
@@ -18,15 +16,16 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AuthProvider>
-            <ToastProvider />
-            <Navbar />
-            <main className="container mx-auto p-4">{children}</main>
-          </AuthProvider>
-        </ThemeProvider>
+   <html lang="en">
+      <body className="min-h-screen flex flex-col">
+        <AuthProvider>
+          <ToastProvider/>
+          <Header />
+          <main className="flex-grow container mx-auto px-4 py-8">
+            {children}
+          </main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   )
