@@ -25,15 +25,12 @@ export default function Dashboard() {
   const { token } = useAuth();
   const router = useRouter();
 
-  const fetchQuizzes = useCallback(async () => {
+    const fetchQuizzes = async () => {
     setLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE}/api/quizzes/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/quizzes/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.ok) setQuizzes(await res.json());
       else toast.error("Failed to load quizzes");
     } catch {
@@ -41,11 +38,14 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  };
+  
+useEffect(() => {
 
-  useEffect(() => {
-    fetchQuizzes();
-  }, [fetchQuizzes]);
+
+  fetchQuizzes();
+}, [token]);
+
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
